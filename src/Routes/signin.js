@@ -10,7 +10,6 @@ const router = express.Router();
 const secret_token = process.env.ACCESS_TOKEN_SECRET;
 const secret_refresh_token = process.env.REFRESH_TOKEN_SECRET;
 
-
 //CHECKING USER IN AND DECODING PASSWORD
 router.post("/", async (req, res) => {
   try {
@@ -34,7 +33,7 @@ router.post("/", async (req, res) => {
       return;
     }
 
-    let access_token = jwt.sign({ userid }, secret_token, { expiresIn: "10m" });
+    let access_token = jwt.sign({ userid }, secret_token, { expiresIn: "30m" });
     let refresh_token = jwt.sign({ userid }, secret_refresh_token, {
       expiresIn: "7d",
     });
@@ -47,17 +46,21 @@ router.post("/", async (req, res) => {
       token: refresh_token,
       expiry_date: expiryTimestamp.toISOString(),
     };
-    await executeQuery("DELETE FROM refresh_tokens WHERE user_id=@user_id");
+    await executeQuery("DELETE FROM refresh_token WHERE user_id=@user_id", {
+      user_id: userid,
+    });
     await executeQuery(
-      "INSERT INTO refresh_tokens (user_id,token,expiry_date) VALUES (@user_id,@token,@expiry_date)",
+      "INSERT INTO refresh_token (user_id,token,expiry_date) VALUES (@user_id,@token,@expiry_date)",
       tokenInfo
     );
 
-    res.cookie("authToken", access_token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-    });
+   res.cookie("authToken", access_token, {
+     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+     httpOnly: true,
+     secure: true, // Must be true for cross-domain cookies
+     sameSite: "None", // Required for cross-domain
+     path: "/",
+   });
     res.status(200).send("Logged in successfully");
   } catch (err) {
     res.status(500).send("An error occured while checking user");

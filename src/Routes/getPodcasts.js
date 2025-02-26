@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    let query = `SELECT * FROM Podcasts;`;
+    let query = `SELECT podcast_id ,podcast_url as song_url, podcast_name as song_name,podcast_image as song_image FROM podcasts`;
     let result = await executeQuery(query);
     res.send(result)
   } catch (err) {

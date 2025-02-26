@@ -1,7 +1,7 @@
 //IMPORTS
 import executeQuery from "../Config/Database.js";
 import express from "express";
-import authenticateToken  from "../Utils/tokenAuth.js";
+import authenticateToken from "../Utils/tokenAuth.js";
 
 const router = express.Router();
 
@@ -9,7 +9,9 @@ const router = express.Router();
 router.post("/", authenticateToken, async (req, res) => {
   try {
     let userId = req.userId;
-    await executeQuery("DELETE FROM refresh_tokens WHERE user_id=@user_id",{user_id:userId});
+    await executeQuery("DELETE FROM refresh_token WHERE user_id=@user_id", {
+      user_id: userId,
+    });
     res.clearCookie("authToken");
     res.status(200).send("Logged out successfully");
   } catch (error) {

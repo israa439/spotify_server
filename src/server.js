@@ -13,7 +13,12 @@ import getAlbumsRoutes from "./Routes/getAlbums.js";
 import sendEmailRoutes from "./Routes/sendEmail.js";
 import verifyEmailRoutes from "./Routes/verifyEmail.js";
 import getPodcastsRoutes from "./Routes/getPodcasts.js";
-
+import addFavoriteSongRoutes from "./Routes/addFavoriteSong.js";
+import addFavoritePodcastRoutes from "./Routes/addFavoritesPodcasts.js";
+import getFavoriteSongsRoutes from "./Routes/getFavoriteSongs.js";
+import getFavoritePodcastsRoutes from "./Routes/getFavoritePodcast.js";
+import deleteFavSongRoutes from "./Routes/removeFavSong.js";
+import deleteFavPodcastRoutes from "./Routes/removeFavPodcast.js";
 //CREATE SERVER
 dotenvConfig();
 const app = express();
@@ -83,6 +88,24 @@ app.use("/logout", logoutRoutes);
 
 //GET PODCASTS ROUTES
 app.use("/getPodcasts", getPodcastsRoutes);
+
+// ADD FAVORITE SONGS ROUTES
+app.use("/addFavoriteSong", addFavoriteSongRoutes);
+
+// ADD FAVORITE PODCASTS ROUTES
+app.use("/addFavoritePodcast", addFavoritePodcastRoutes);
+
+// GET FAVORITE SONGS ROUTES
+app.use("/getFavoriteSongs", getFavoriteSongsRoutes);
+
+// GET FAVORITE PODCASTS ROUTES
+app.use("/getFavoritePodcasts", getFavoritePodcastsRoutes);
+
+// DELETE FAVORITE SONGS ROUTES
+app.use("/deleteFavSong", deleteFavSongRoutes);
+
+// DELETE FAVORITE PODCASTS ROUTES
+app.use("/deleteFavPodcast", deleteFavPodcastRoutes);
 
 //LISTEN TO PORT
 app.listen(PORT, () => {

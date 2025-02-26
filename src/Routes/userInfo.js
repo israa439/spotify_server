@@ -13,6 +13,7 @@ router.get("/", authenticateToken, async (req, res) => {
     if (!userId) {
       return res.status(400).send("User not found");
     }
+
     let query = `SELECT fullname FROM Users WHERE user_id = '${userId}'`;
     let result = await executeQuery(query);
     res.send(result[0].fullname);

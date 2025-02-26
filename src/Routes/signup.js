@@ -27,11 +27,12 @@ router.post("/", async (req, res) => {
 
     await executeQuery(query, values);
     let access_token = jwt.sign({ userid }, secret_token, {
-      expiresIn: "10m",
+      expiresIn: "30m",
     });
     let refresh_token = jwt.sign({ userid }, secret_refresh_token, {
       expiresIn: "7d",
     });
+
     let currentTimestamp = new Date();
     let expiryTimestamp = new Date(
       currentTimestamp.getTime() + 7 * 24 * 60 * 60 * 1000
@@ -42,14 +43,15 @@ router.post("/", async (req, res) => {
       expiry_date: expiryTimestamp.toISOString(),
     };
     await executeQuery(
-      "INSERT INTO refresh_tokens (user_id,token,expiry_date) VALUES (@user_id,@token,@expiry_date)",
+      `INSERT INTO refresh_token (user_id,token,expiry_date) VALUES (@user_id,@token,@expiry_date)`,
       tokenInfo
     );
-
     res.cookie("authToken", access_token, {
+      maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
       httpOnly: true,
-      secure: true,
-      sameSite: "strict",
+      secure: true, // Must be true for cross-domain cookies
+      sameSite: "None", // Required for cross-domain
+      path: "/",
     });
 
     res.status(200).send("The account was created successfully");

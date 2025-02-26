@@ -26,18 +26,17 @@ async function authenticateToken(req, res, next) {
     let currentTime = Date.now();
     if (decoded.exp * 1000 < Date.now()) {
       let result = await executeQuery(
-        "SELECT * FROM refresh_tokens WHERE user_id=@user_id",
+        "SELECT * FROM refresh_token WHERE user_id=@user_id",
         { user_id: decoded.userid }
       );
       if (result.length === 0) {
         return res.status(403).send("Your session has expired");
       }
-      
+
       if (new Date(result[0].expiry_date) <= currentTime) {
-        await executeQuery(
-          "DELETE FROM refresh_tokens WHERE user_id=@user_id",
-          { user_id: decoded.userid }
-        );
+        await executeQuery("DELETE FROM refresh_token WHERE user_id=@user_id", {
+          user_id: decoded.userid,
+        });
         res.clearCookie("authToken");
         return res.status(403).send("Your session has expired");
       }
@@ -45,13 +44,19 @@ async function authenticateToken(req, res, next) {
       jwt.verify(result[0].token, secret_refresh_token, (err) => {
         if (err) return res.status(403).send(err.message);
         let access_token = jwt.sign({ userid: decoded.userid }, secret_token, {
-          expiresIn: "10m",
+          expiresIn: "30m",
         });
         res.cookie("authToken", access_token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "strict",
+          maxAge: 30 * 24 * 60 * 60 * 1000,
         });
+
+        //   res.cookie("authToken", access_token, {
+        //     httpOnly: true,
+        //     // secure: true,
+        //     sameSite: "strict",
+        //     path: "/*",
+        //     maxAge: 7 * 24 * 60 * 60 * 1000,
+        //   });
       });
     } else {
       jwt.verify(token, secret_token, (err) => {
